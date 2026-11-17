@@ -28,9 +28,11 @@ import { Card, CardHeader } from "@/shared/components/Card";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ProgressBar } from "@/shared/components/ProgressBar";
+import { ListSkeleton, Skeleton } from "@/shared/components/Spinner";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
-import { contractStatusLabels, roleLabels } from "@/shared/utils/labels";
+import { contractStatusLabels, humanizeKey, roleLabels } from "@/shared/utils/labels";
 import { formatDateTime, formatMoney, shortId } from "@/shared/utils/format";
+import { cn } from "@/shared/utils/cn";
 
 export function DashboardPage() {
   useDocumentTitle("Panel");
@@ -101,21 +103,26 @@ export function DashboardPage() {
             <ErrorAlert error={reportsQuery.error} title="No se pudieron cargar los reportes" />
           ) : null}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {reports.length === 0 ? (
+            {reportsQuery.isLoading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <Metric key={index} label="Cargando métrica" value="" loading />
+              ))
+            ) : reports.length === 0 ? (
               <Card className="sm:col-span-2 xl:col-span-4">
                 <p className="text-sm text-ink-500">
-                  {reportsQuery.isLoading ? "Cargando reportes…" : "El backend no devolvió métricas agregadas."}
+                  El backend no devolvió métricas agregadas.
                 </p>
               </Card>
             ) : (
               Object.entries(reports[0].metrics ?? {})
                 .slice(0, 4)
-                .map(([key, value]) => (
+                .map(([key, value], index) => (
                   <Metric
                     key={key}
-                    label={key.replaceAll("_", " ")}
+                    label={humanizeKey(key)}
                     value={typeof value === "object" ? "—" : String(value)}
                     icon={<ClipboardList className="size-4" />}
+                    tone={["brand", "accent", "info", "success"][index % 4] as MetricTone}
                   />
                 ))
             )}
@@ -135,7 +142,7 @@ export function DashboardPage() {
               <div className="mt-4 flex flex-wrap gap-2">
                 {reports.map((report) => (
                   <Badge key={`${report.report}-${report.generatedAt}`} tone="brand">
-                    {report.report}
+                    {humanizeKey(report.report)}
                   </Badge>
                 ))}
                 {reports.length === 0 && <p className="text-sm text-ink-500">Sin reportes.</p>}
@@ -183,21 +190,67 @@ export function DashboardPage() {
                   label="Mis proyectos"
                   value={String(myProjectsQuery.data?.length ?? 0)}
                   icon={<BriefcaseBusiness className="size-4" />}
+                  loading={myProjectsQuery.isLoading}
+                  hint="Borradores y publicados"
                 />
-                <Metric label="Contratos activos" value={String(activeContracts)} icon={<FileText className="size-4" />} />
+                <Metric
+                  label="Contratos activos"
+                  value={String(activeContracts)}
+                  icon={<FileText className="size-4" />}
+                  tone="info"
+                  loading={contractsQuery.isLoading}
+                  hint={`${completedContracts} completados`}
+                />
                 <Metric
                   label="Total pagado"
                   value={formatMoney(clientReleased, currency)}
                   icon={<Wallet className="size-4" />}
+                  tone="success"
+                  loading={paymentsQuery.isLoading}
+                  hint="Pagos simulados liberados"
                 />
-                <Metric label="Mensajes sin leer" value={String(unread)} icon={<MessageSquareText className="size-4" />} />
+                <Metric
+                  label="Mensajes sin leer"
+                  value={String(unread)}
+                  icon={<MessageSquareText className="size-4" />}
+                  tone="accent"
+                  loading={conversationsQuery.isLoading}
+                  hint={`${conversations.length} conversaciones`}
+                />
               </>
             ) : (
               <>
-                <Metric label="Contratos activos" value={String(activeContracts)} icon={<FileText className="size-4" />} />
-                <Metric label="Completados" value={String(completedContracts)} icon={<Star className="size-4" />} />
-                <Metric label="Neto liberado" value={formatMoney(netReleased, currency)} icon={<Wallet className="size-4" />} />
-                <Metric label="Mensajes sin leer" value={String(unread)} icon={<MessageSquareText className="size-4" />} />
+                <Metric
+                  label="Contratos activos"
+                  value={String(activeContracts)}
+                  icon={<FileText className="size-4" />}
+                  loading={contractsQuery.isLoading}
+                  hint="En ejecución ahora"
+                />
+                <Metric
+                  label="Completados"
+                  value={String(completedContracts)}
+                  icon={<Star className="size-4" />}
+                  tone="info"
+                  loading={contractsQuery.isLoading}
+                  hint="Histórico de contratos"
+                />
+                <Metric
+                  label="Neto liberado"
+                  value={formatMoney(netReleased, currency)}
+                  icon={<Wallet className="size-4" />}
+                  tone="success"
+                  loading={paymentsQuery.isLoading}
+                  hint="Después de comisión"
+                />
+                <Metric
+                  label="Mensajes sin leer"
+                  value={String(unread)}
+                  icon={<MessageSquareText className="size-4" />}
+                  tone="accent"
+                  loading={conversationsQuery.isLoading}
+                  hint={`${conversations.length} conversaciones`}
+                />
               </>
             )}
           </div>
@@ -252,10 +305,12 @@ export function DashboardPage() {
                 />
                 {contractsQuery.isError ? (
                   <ErrorAlert error={contractsQuery.error} className="mt-4" />
+                ) : contractsQuery.isLoading ? (
+                  <div className="mt-4">
+                    <ListSkeleton rows={2} />
+                  </div>
                 ) : contracts.length === 0 ? (
-                  <p className="mt-4 text-sm text-ink-500">
-                    {contractsQuery.isLoading ? "Cargando contratos…" : "Aún no tienes contratos."}
-                  </p>
+                  <p className="mt-4 text-sm text-ink-500">Aún no tienes contratos.</p>
                 ) : (
                   <ul className="mt-4 space-y-3">
                     {contracts.slice(0, 3).map((contract) => (
@@ -402,14 +457,52 @@ export function DashboardPage() {
   );
 }
 
-function Metric({ label, value, icon }: { label: string; value: string; icon?: ReactNode }) {
+type MetricTone = "brand" | "accent" | "info" | "success";
+
+const metricTones: Record<MetricTone, string> = {
+  brand:
+    "bg-brand-50 text-brand-700 ring-brand-100 dark:bg-brand-600/15 dark:text-brand-200 dark:ring-brand-600/30",
+  accent:
+    "bg-accent-50 text-accent-700 ring-accent-100 dark:bg-accent-600/15 dark:text-accent-200 dark:ring-accent-600/30",
+  info: "bg-info-50 text-info-700 ring-info-100 dark:bg-info-600/15 dark:text-info-200 dark:ring-info-600/30",
+  success:
+    "bg-success-50 text-success-700 ring-success-100 dark:bg-success-600/15 dark:text-success-200 dark:ring-success-600/30",
+};
+
+function Metric({
+  label,
+  value,
+  icon,
+  hint,
+  loading,
+  tone = "brand",
+}: {
+  label: string;
+  value: string;
+  icon?: ReactNode;
+  hint?: string;
+  loading?: boolean;
+  tone?: MetricTone;
+}) {
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white p-4 shadow-soft">
-      <p className="flex items-center gap-1.5 text-xs font-medium capitalize text-ink-500">
-        {icon}
-        {label}
-      </p>
-      <p className="mt-1 text-lg font-bold text-ink-950">{value}</p>
+    <div className="rounded-2xl border border-ink-200 bg-white p-4 shadow-card transition hover:shadow-float dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-medium text-ink-500">{label}</p>
+        <span
+          className={cn(
+            "flex size-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset",
+            metricTones[tone],
+          )}
+        >
+          {icon}
+        </span>
+      </div>
+      {loading ? (
+        <Skeleton className="mt-3 h-7 w-24" />
+      ) : (
+        <p className="mt-2 text-2xl font-bold tracking-tight text-ink-950 dark:text-white">{value}</p>
+      )}
+      {hint && <p className="mt-1 text-xs text-ink-500">{hint}</p>}
     </div>
   );
 }

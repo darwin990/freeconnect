@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { BriefcaseBusiness, UserRound } from "lucide-react";
+import { BriefcaseBusiness, CheckCircle2, ShieldCheck, UserRound } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { AuthShell } from "@/features/auth/AuthShell";
 import { registerSchema, type RegisterValues } from "@/features/auth/schemas";
@@ -11,6 +11,23 @@ import { Button } from "@/shared/components/Button";
 import { Field, Input } from "@/shared/components/FormControls";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { cn } from "@/shared/utils/cn";
+
+const roleOptions = [
+  {
+    value: "CLIENT" as const,
+    label: "Cliente",
+    description: "Publico proyectos",
+    detail: "Creas proyectos, evalúas propuestas y liberas pagos simulados.",
+    icon: BriefcaseBusiness,
+  },
+  {
+    value: "FREELANCER" as const,
+    label: "Freelancer",
+    description: "Envío propuestas",
+    detail: "Completas tu perfil, envías propuestas y entregas hitos.",
+    icon: UserRound,
+  },
+];
 
 export function RegisterPage() {
   useDocumentTitle("Crear cuenta");
@@ -68,35 +85,30 @@ export function RegisterPage() {
         {error ? <ErrorAlert error={error} title="No se pudo crear la cuenta" /> : null}
 
         <fieldset>
-          <legend className="mb-2 text-sm font-medium text-ink-800">Quiero usar FreeConnect como</legend>
+          <legend className="mb-2 text-sm font-medium text-ink-800 dark:text-slate-200">
+            Quiero usar FreeConnect como
+          </legend>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              {
-                value: "CLIENT" as const,
-                label: "Cliente",
-                description: "Publico proyectos",
-                icon: BriefcaseBusiness,
-              },
-              {
-                value: "FREELANCER" as const,
-                label: "Freelancer",
-                description: "Envío propuestas",
-                icon: UserRound,
-              },
-            ].map((option) => {
+            {roleOptions.map((option) => {
               const Icon = option.icon;
               const selected = role === option.value;
               return (
                 <label
                   key={option.value}
                   className={cn(
-                    "flex cursor-pointer flex-col gap-1 rounded-xl border p-3 text-sm transition focus-within:ring-2 focus-within:ring-brand-200",
+                    "relative flex cursor-pointer flex-col gap-1 rounded-2xl border p-3 text-sm transition focus-within:ring-2 focus-within:ring-brand-200",
                     selected
-                      ? "border-brand-600 bg-brand-50 text-brand-900"
-                      : "border-ink-300 bg-white text-ink-700 hover:border-ink-400",
+                      ? "border-brand-600 bg-brand-50 text-brand-900 shadow-sm dark:bg-brand-600/15 dark:text-brand-100"
+                      : "border-ink-300 bg-white text-ink-700 hover:border-ink-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200",
                   )}
                 >
                   <input type="radio" value={option.value} className="sr-only" {...register("role")} />
+                  {selected && (
+                    <CheckCircle2
+                      className="absolute right-2.5 top-2.5 size-4 text-brand-700 dark:text-brand-300"
+                      aria-hidden="true"
+                    />
+                  )}
                   <Icon className="size-5" aria-hidden="true" />
                   <span className="font-semibold">{option.label}</span>
                   <span className="text-xs text-ink-500">{option.description}</span>
@@ -104,7 +116,16 @@ export function RegisterPage() {
               );
             })}
           </div>
-          {errors.role ? <p className="mt-1 text-sm text-red-700">{errors.role.message}</p> : null}
+          <p className="mt-2 text-xs leading-relaxed text-ink-500">
+            {role === "FREELANCER"
+              ? "Como freelancer necesitarás completar tu perfil profesional antes de enviar propuestas."
+              : "Como cliente podrás publicar proyectos y aceptar propuestas para crear contratos."}
+          </p>
+          {errors.role ? (
+            <p className="mt-1 text-sm font-medium text-danger-700" role="alert">
+              {errors.role.message}
+            </p>
+          ) : null}
         </fieldset>
 
         <Field label="Nombre visible" htmlFor="displayName" error={errors.displayName?.message} required>
@@ -116,6 +137,7 @@ export function RegisterPage() {
             {...register("displayName")}
           />
         </Field>
+
         <Field label="Correo electrónico" htmlFor="register-email" error={errors.email?.message} required>
           <Input
             id="register-email"
@@ -126,6 +148,7 @@ export function RegisterPage() {
             {...register("email")}
           />
         </Field>
+
         <Field
           label="Contraseña"
           htmlFor="register-password"
@@ -137,10 +160,12 @@ export function RegisterPage() {
             id="register-password"
             type="password"
             autoComplete="new-password"
+            placeholder="Crea una contraseña segura"
             invalid={Boolean(errors.password)}
             {...register("password")}
           />
         </Field>
+
         <Field
           label="Confirmar contraseña"
           htmlFor="confirm-password"
@@ -151,16 +176,20 @@ export function RegisterPage() {
             id="confirm-password"
             type="password"
             autoComplete="new-password"
+            placeholder="Repite la contraseña"
             invalid={Boolean(errors.confirmPassword)}
             {...register("confirmPassword")}
           />
         </Field>
 
-        <Button type="submit" className="w-full" loading={isSubmitting}>
+        <Button type="submit" className="w-full" size="lg" loading={isSubmitting}>
           Crear cuenta
         </Button>
-        <p className="text-center text-xs text-ink-500">
-          Al registrarte aceptas el uso de esta demo. No se realizan cobros reales.
+
+        <p className="flex items-start gap-2 rounded-xl bg-ink-50 p-3 text-xs leading-relaxed text-ink-600 dark:bg-slate-950/60 dark:text-slate-300">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success-600" aria-hidden="true" />
+          Al registrarte aceptas el uso de esta demo. No se realizan cobros reales y el correo
+          electrónico no se verifica.
         </p>
       </form>
     </AuthShell>

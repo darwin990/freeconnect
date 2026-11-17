@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import {
   ArrowLeft,
+  ArrowRight,
   CalendarDays,
   CreditCard,
   MessageSquareText,
@@ -15,6 +16,7 @@ import { contractsApi } from "@/features/contracts/api";
 import { useCancelContract, useContract } from "@/features/contracts/hooks";
 import { useContractPayments, useReleasePayment } from "@/features/payments/hooks";
 import { useContractReviews, useCreateReview } from "@/features/reviews/hooks";
+import { useToast } from "@/components/ui/Toast";
 import { ErrorAlert } from "@/shared/components/Alert";
 import { Badge, StatusBadge } from "@/shared/components/Badge";
 import { Button } from "@/shared/components/Button";
@@ -23,11 +25,12 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { Field, Input, Select, Textarea } from "@/shared/components/FormControls";
 import { Modal } from "@/shared/components/Modal";
 import { PageHeader } from "@/shared/components/PageHeader";
-import { PageLoader } from "@/shared/components/Spinner";
+import { DetailSkeleton } from "@/shared/components/Spinner";
 import { ProgressBar } from "@/shared/components/ProgressBar";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { contractStatusLabels, paymentStatusLabels } from "@/shared/utils/labels";
 import { formatDate, formatDateTime, formatMoney, shortId } from "@/shared/utils/format";
+import { cn } from "@/shared/utils/cn";
 
 export function ContractDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -39,6 +42,7 @@ export function ContractDetailPage() {
   const cancelContract = useCancelContract(id ?? "");
   const releasePayment = useReleasePayment(id ?? "");
   const createReview = useCreateReview(id ?? "");
+  const { toast } = useToast();
 
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
@@ -56,7 +60,7 @@ export function ContractDetailPage() {
     onSuccess: (conversation) => navigate(`/app/mensajes/${conversation.id}`),
   });
 
-  if (contractQuery.isLoading) return <PageLoader label="Cargando contrato" />;
+  if (contractQuery.isLoading) return <DetailSkeleton />;
   if (contractQuery.isError) {
     return (
       <div className="space-y-4">
@@ -103,6 +107,11 @@ export function ContractDetailPage() {
     try {
       await releasePayment.mutateAsync(amount);
       setPaymentAmount(String(contract.amount.amount));
+      toast({
+        tone: "success",
+        title: "Pago liberado",
+        description: "El pago simulado quedó registrado en el contrato.",
+      });
     } catch (error) {
       setPaymentError(error);
     }
@@ -116,6 +125,11 @@ export function ContractDetailPage() {
         comment: reviewComment.trim() || undefined,
       });
       setReviewComment("");
+      toast({
+        tone: "success",
+        title: "Reseña publicada",
+        description: "La otra parte ya puede ver tu calificación.",
+      });
     } catch (error) {
       setReviewError(error);
     }
@@ -163,45 +177,54 @@ export function ContractDetailPage() {
         description={contract.scope || "Sin alcance detallado."}
       />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <StatusBadge status={contract.status} label={contractStatusLabels[contract.status]} />
-        <Badge tone="info">Progreso {contract.progress}%</Badge>
-        <Badge tone="neutral">Hitos aprobados: {contract.approvedMilestones}</Badge>
-        <Badge tone="neutral">{isClient ? "Eres el cliente" : "Eres el freelancer"}</Badge>
-        <Link
-          to={`/proyectos/${contract.projectId}`}
-          className="text-sm font-semibold text-brand-700 hover:underline"
-        >
-          Ver proyecto
-        </Link>
-      </div>
+      <Card className="overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge status={contract.status} label={contractStatusLabels[contract.status]} />
+            <Badge tone="info">Progreso {contract.progress}%</Badge>
+            <Badge tone="neutral">Hitos aprobados: {contract.approvedMilestones}</Badge>
+            <Badge tone="brand">{isClient ? "Eres el cliente" : "Eres el freelancer"}</Badge>
+          </div>
+          <Link
+            to={`/proyectos/${contract.projectId}`}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline"
+          >
+            Ver proyecto <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric
-          label="Monto del contrato"
-          value={formatMoney(contract.amount.amount, contract.amount.currency)}
-        />
-        <Metric
-          label="Comisión"
-          value={formatMoney(contract.commission.amount, contract.commission.currency)}
-        />
-        <Metric
-          label="Inicio"
-          value={formatDate(contract.startDate)}
-          icon={<CalendarDays className="size-4" />}
-        />
-        <Metric
-          label="Fin"
-          value={formatDate(contract.endDate)}
-          icon={<CalendarDays className="size-4" />}
-        />
-      </div>
-      <ProgressBar value={contract.progress} label="Progreso global del contrato" />
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric
+            label="Monto del contrato"
+            value={formatMoney(contract.amount.amount, contract.amount.currency)}
+            tone="brand"
+          />
+          <Metric
+            label="Comisión"
+            value={formatMoney(contract.commission.amount, contract.commission.currency)}
+            tone="neutral"
+          />
+          <Metric
+            label="Inicio"
+            value={formatDate(contract.startDate)}
+            icon={<CalendarDays className="size-4" />}
+            tone="info"
+          />
+          <Metric
+            label="Fin"
+            value={formatDate(contract.endDate)}
+            icon={<CalendarDays className="size-4" />}
+            tone="accent"
+          />
+        </div>
+
+        <ProgressBar value={contract.progress} label="Progreso global del contrato" className="mt-5" />
+      </Card>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-ink-950">Hitos y entregables</h2>
+            <h2 className="text-lg font-semibold text-ink-950 dark:text-white">Hitos y entregables</h2>
             <span className="text-sm text-ink-500">{contract.milestones.length} hitos</span>
           </div>
           {contract.milestones.length === 0 ? (
@@ -221,19 +244,20 @@ export function ContractDetailPage() {
           )}
         </div>
 
-        <aside className="space-y-6">
+        <aside className="space-y-6 xl:sticky xl:top-20 xl:self-start">
           <Card>
             <CardHeader
               title="Pagos"
               description="Pasarela simulada; no se realizan cobros reales."
             />
             {canReleasePayment && (
-              <div className="mt-4 space-y-3 rounded-xl bg-ink-50 p-3">
+              <div className="mt-4 space-y-3 rounded-xl border border-ink-200 bg-ink-50 p-3 dark:border-slate-700 dark:bg-slate-950/60">
                 {paymentError ? <ErrorAlert error={paymentError} /> : null}
                 {releasePayment.isSuccess && !paymentError ? (
-                  <p className="text-sm text-emerald-800" role="status">
-                    Pago registrado correctamente.
-                  </p>
+                  <div className="flex items-start gap-2 rounded-lg bg-success-50 p-2.5 text-sm text-success-800 ring-1 ring-inset ring-success-200" role="status">
+                    <CreditCard className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    <p>Pago registrado correctamente.</p>
+                  </div>
                 ) : null}
                 <Field label="Monto a liberar" htmlFor="payment-amount">
                   <Input
@@ -414,6 +438,11 @@ export function ContractDetailPage() {
                   onSuccess: () => {
                     setCancelOpen(false);
                     setCancelReason("");
+                    toast({
+                      tone: "success",
+                      title: "Contrato cancelado",
+                      description: "El contrato pasó a estado CANCELLED.",
+                    });
                   },
                 });
               }}
@@ -439,14 +468,33 @@ export function ContractDetailPage() {
   );
 }
 
-function Metric({ label, value, icon }: { label: string; value: string; icon?: ReactNode }) {
+type MetricTone = "brand" | "accent" | "info" | "neutral";
+
+const metricTones: Record<MetricTone, string> = {
+  brand: "border-brand-100 bg-brand-50/70 dark:border-brand-800 dark:bg-brand-950/30",
+  accent: "border-accent-100 bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900/20",
+  info: "border-info-100 bg-info-50/70 dark:border-info-700 dark:bg-info-900/20",
+  neutral: "border-ink-200 bg-ink-50/70 dark:border-slate-800 dark:bg-slate-950/40",
+};
+
+function Metric({
+  label,
+  value,
+  icon,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  icon?: ReactNode;
+  tone?: MetricTone;
+}) {
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white p-4 shadow-soft">
+    <div className={cn("rounded-xl border p-3", metricTones[tone])}>
       <p className="flex items-center gap-1.5 text-xs font-medium text-ink-500">
         {icon}
         {label}
       </p>
-      <p className="mt-1 text-lg font-bold text-ink-950">{value}</p>
+      <p className="mt-1 text-lg font-bold tracking-tight text-ink-950 dark:text-white">{value}</p>
     </div>
   );
 }
