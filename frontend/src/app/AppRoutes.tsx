@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "@/app/AppShell";
 import { NotFoundPage } from "@/app/NotFoundPage";
 import { PublicLayout } from "@/app/PublicLayout";
+import { AboutPage } from "@/features/about/AboutPage";
 import { AdminAuditPage } from "@/features/admin/pages/AdminAuditPage";
 import { AdminModerationPage } from "@/features/admin/pages/AdminModerationPage";
 import { AdminReportsPage } from "@/features/admin/pages/AdminReportsPage";
@@ -12,6 +13,7 @@ import { PublicOnlyRoute, RequireAuth, RequireRole } from "@/features/auth/guard
 import { ContractDetailPage } from "@/features/contracts/pages/ContractDetailPage";
 import { ContractsPage } from "@/features/contracts/pages/ContractsPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DemoPage } from "@/features/demo/DemoPage";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { ConversationDetailPage } from "@/features/messaging/pages/ConversationDetailPage";
 import { ConversationsPage } from "@/features/messaging/pages/ConversationsPage";
@@ -34,6 +36,8 @@ export function AppRoutes() {
         <Route index element={<LandingPage />} />
         <Route path="proyectos" element={<ProjectsPage />} />
         <Route path="proyectos/:id" element={<ProjectDetailPage />} />
+        <Route path="acerca" element={<AboutPage />} />
+        <Route path="demo" element={<DemoPage />} />
       </Route>
 
       <Route
