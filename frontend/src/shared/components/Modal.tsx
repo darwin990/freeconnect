@@ -60,7 +60,7 @@ export function Modal({
   const maxWidth = size === "sm" ? "max-w-md" : size === "lg" ? "max-w-3xl" : "max-w-xl";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/50 p-4 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/60 p-0 backdrop-blur-sm animate-fade-in sm:items-center sm:p-4">
       <div
         className="absolute inset-0"
         aria-hidden="true"
@@ -73,20 +73,23 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`relative z-10 w-full ${maxWidth} max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-xl`}
+        className={`relative z-10 w-full ${maxWidth} max-h-[92vh] overflow-y-auto rounded-t-3xl bg-white p-5 shadow-float animate-scale-in dark:bg-slate-900 sm:rounded-2xl sm:p-6`}
       >
+        <div className="mb-4 h-1.5 w-12 rounded-full bg-ink-200 dark:bg-slate-700 sm:hidden" aria-hidden="true" />
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 id={titleId} className="text-lg font-semibold text-ink-950">
+            <h2 id={titleId} className="text-lg font-semibold text-ink-950 dark:text-white">
               {title}
             </h2>
-            {description && <p className="mt-1 text-sm text-ink-500">{description}</p>}
+            {description && (
+              <p className="mt-1 text-sm leading-relaxed text-ink-500">{description}</p>
+            )}
           </div>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-ink-500 hover:bg-ink-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600"
+            className="rounded-lg p-1.5 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600 dark:hover:bg-slate-800"
             aria-label="Cerrar diálogo"
           >
             <X className="size-5" aria-hidden="true" />

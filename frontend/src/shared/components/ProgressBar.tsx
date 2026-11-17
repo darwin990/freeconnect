@@ -15,10 +15,10 @@ export function ProgressBar({
     <div className={className}>
       <div className="mb-1 flex justify-between text-xs text-ink-500">
         <span>{label ?? "Progreso"}</span>
-        <span className="font-semibold text-ink-700">{formatPercent(clamped)}</span>
+        <span className="font-semibold text-ink-700 dark:text-slate-200">{formatPercent(clamped)}</span>
       </div>
       <div
-        className="h-2 overflow-hidden rounded-full bg-ink-200"
+        className="h-2 overflow-hidden rounded-full bg-ink-200 dark:bg-slate-800"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -26,7 +26,9 @@ export function ProgressBar({
         aria-label={label ?? "Progreso"}
       >
         <div
-          className={cn("h-full rounded-full bg-brand-600 transition-all")}
+          className={cn(
+            "h-full rounded-full bg-gradient-to-r from-brand-600 to-accent-500 transition-all duration-500 ease-smooth",
+          )}
           style={{ width: `${clamped}%` }}
         />
       </div>

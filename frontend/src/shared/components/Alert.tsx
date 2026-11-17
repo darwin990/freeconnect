@@ -7,16 +7,16 @@ type Tone = "error" | "success" | "info";
 
 const styles: Record<Tone, { box: string; icon: ReactNode }> = {
   error: {
-    box: "border-red-200 bg-red-50 text-red-900",
-    icon: <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />,
+    box: "border-danger-200 bg-danger-50 text-danger-900 dark:border-danger-600/40 dark:bg-danger-600/10 dark:text-danger-100",
+    icon: <AlertCircle className="mt-0.5 size-5 shrink-0 text-danger-600" aria-hidden="true" />,
   },
   success: {
-    box: "border-emerald-200 bg-emerald-50 text-emerald-900",
-    icon: <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden="true" />,
+    box: "border-success-200 bg-success-50 text-success-900 dark:border-success-600/40 dark:bg-success-600/10 dark:text-success-100",
+    icon: <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden="true" />,
   },
   info: {
-    box: "border-sky-200 bg-sky-50 text-sky-900",
-    icon: <Info className="mt-0.5 size-5 shrink-0" aria-hidden="true" />,
+    box: "border-info-200 bg-info-50 text-info-900 dark:border-info-600/40 dark:bg-info-600/10 dark:text-info-100",
+    icon: <Info className="mt-0.5 size-5 shrink-0 text-info-600" aria-hidden="true" />,
   },
 };
 
@@ -33,13 +33,13 @@ export function Alert({
 }) {
   return (
     <div
-      className={cn("flex gap-3 rounded-xl border p-4 text-sm", styles[tone].box, className)}
+      className={cn("flex gap-3 rounded-xl border p-4 text-sm shadow-sm animate-fade-in", styles[tone].box, className)}
       role={tone === "error" ? "alert" : "status"}
     >
       {styles[tone].icon}
       <div className="min-w-0 space-y-1">
         {title && <p className="font-semibold">{title}</p>}
-        <div>{children}</div>
+        <div className="leading-relaxed">{children}</div>
       </div>
     </div>
   );

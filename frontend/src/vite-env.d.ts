@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
   readonly VITE_NOTIFICATIONS_POLL_MS?: string;
+  readonly VITE_MESSAGING_POLL_MS?: string;
+  readonly VITE_ENABLE_DEMO?: string;
 }
 
 interface ImportMeta {
