@@ -69,6 +69,7 @@ Archivo `.env` (basado en `.env.example`):
 | `VITE_API_BASE_URL` | `http://localhost:8080/api/v1` | Base de la API. En Docker se usa `/api/v1` con proxy de nginx. |
 | `VITE_NOTIFICATIONS_POLL_MS` | `30000` | Polling de notificaciones. `0` lo desactiva. |
 | `VITE_MESSAGING_POLL_MS` | `5000` | Polling de conversaciones y mensajes. `0` lo desactiva. |
+| `VITE_ENABLE_DEMO` | vacío | `true` habilita `/demo` en builds de producción. En desarrollo siempre está activa. |
 
 No hay secretos en el frontend. Las variables `VITE_*` son públicas por diseño.
 
@@ -97,12 +98,16 @@ El archivo `src/types/api.ts` es **generado**. No editarlo a mano: usa `npm run 
 
 ```
 src/
-├── app/                 # Layouts, router, providers, error boundary
+├── app/                 # Layouts, router, providers, tema, error boundary
+├── components/
+│   └── ui/              # Superficie pública del design system
 ├── features/
+│   ├── about/           # Página “Acerca del prototipo”
 │   ├── admin/           # Reportes, moderación, usuarios, auditoría
-│   ├── auth/            # Login, registro, guards, AuthProvider
+│   ├── auth/            # Login, registro, guards, AuthProvider, AuthShell
 │   ├── contracts/       # Contratos, hitos, entregables, tareas
 │   ├── dashboard/       # Panel adaptado por rol
+│   ├── demo/            # Galería visual (bandera VITE_ENABLE_DEMO)
 │   ├── landing/         # Página pública de inicio
 │   ├── messaging/       # Conversaciones y mensajes
 │   ├── notifications/   # Bandeja y reintentos
@@ -113,7 +118,7 @@ src/
 │   └── reviews/         # Reseñas
 ├── shared/
 │   ├── api/             # Cliente HTTP, errores, sesión, query keys
-│   ├── components/      # UI reutilizable y accesible
+│   ├── components/      # Componentes canónicos reutilizables
 │   ├── hooks/           # Hooks compartidos
 │   └── utils/           # Formato, etiquetas, clases
 ├── types/
@@ -133,6 +138,8 @@ src/
 | `/` | Landing con proyectos publicados recientes |
 | `/proyectos` | Catálogo con filtros y paginación en URL |
 | `/proyectos/:id` | Detalle del proyecto y postulación |
+| `/acerca` | Acerca del prototipo: alcance, roles, seguridad y límites |
+| `/demo` | Galería visual del design system (bandera `VITE_ENABLE_DEMO`) |
 | `/login`, `/registro` | Autenticación |
 
 ### Panel autenticado (`/app`)
@@ -155,6 +162,37 @@ src/
 | `/app/admin/auditoria` | ADMIN |
 
 Las rutas están protegidas con `RequireAuth` y `RequireRole`. Además, la navegación lateral se construye según el rol y las acciones de cada pantalla respetan las reglas del backend.
+
+---
+
+## Diseño, tema y accesibilidad
+
+La capa visual se apoya en tokens de Tailwind (`tailwind.config.js`) y en un design
+system propio. Los componentes canónicos viven en `src/shared/components`; la
+superficie pública y los componentes nuevos se exponen desde `src/components/ui`.
+
+- **Tokens:** escalas `brand`, `accent`, `ink`, `success`, `warning`, `danger`, `info`;
+  sombras `card`, `float`, `glow`; radios hasta `4xl`; animaciones de 150–250 ms.
+- **Shell por rol:** `AppShell` agrupa la navegación en “Principal”, “Colaboración”
+  y “Cuenta”, muestra avatar, tema y notificaciones, y usa un drawer accesible en móvil.
+- **Estados:** skeletons con shimmer, estados vacíos ilustrados, toasts (`role="status"`),
+  modales con trampa de foco y cierre con Escape, y mensajes de error uniformes.
+- **Tema:** claro por defecto y oscuro opcional persistido en `localStorage`
+  (`freeconnect.theme`). Un script en `index.html` aplica el tema antes de pintar
+  para evitar el destello. El soporte oscuro es **parcial**: se remapean las
+  superficies y textos más comunes, no cada utilidad.
+- **Accesibilidad:** foco visible global, enlace “Saltar al contenido”, etiquetas
+  asociadas, `aria-*` en controles, contraste orientado a AA y respeto de
+  `prefers-reduced-motion`.
+- **Responsive:** una columna en móvil, rejillas progresivas y acciones que pasan a
+  menús o drawers sin ocultar rutas.
+
+### Galería visual
+
+`/demo` muestra tokens, botones, formularios, badges, toasts, modales, skeletons y
+estados vacíos sin tocar datos reales. En desarrollo siempre está disponible; en
+producción requiere `VITE_ENABLE_DEMO=true` al compilar. La navegación pública solo
+enlaza la demo cuando la bandera está activa.
 
 ---
 
@@ -304,6 +342,10 @@ El smoke test genera usuarios únicos, publica un proyecto, envía una propuesta
 - Los pagos son simulados (`PAYMENT_PROVIDER=MOCK`). No hay integración real ni WebSockets.
 - El catálogo público excluye borradores por defecto.
 - La sesión no persiste el access token entre recargas; se recupera con refresh.
+- El design system extiende Tailwind y componentes propios; no se añadió una librería
+  de UI externa. El tema oscuro es una mejora visual acotada, no un requisito del MVP.
+- `/demo` y `/acerca` son rutas públicas de documentación visual; la demo se controla
+  con `VITE_ENABLE_DEMO` y no altera el contrato de la API.
 
 ---
 
