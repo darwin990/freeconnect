@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FreeConnect">
+  <rect width="64" height="64" rx="16" fill="#0d6ef0"/>
+  <path d="M18 24a10 10 0 0 1 10-10h8v8h-8a2 2 0 0 0-2 2v4h10v8H26v14h-8V24Zm20 8h8v18a10 10 0 0 1-10 10h-8v-8h8a2 2 0 0 0 2-2V32Z" fill="#fff"/>
+</svg>

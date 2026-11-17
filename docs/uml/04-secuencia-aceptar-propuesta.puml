@@ -1,0 +1,61 @@
+@startuml
+title FreeConnect - RF-05 / RF-06: aceptar propuesta y completar contrato
+
+skinparam shadowing false
+skinparam monochrome true
+autonumber
+
+actor Cliente
+actor Freelancer
+participant "ProposalController" as PC
+participant "AcceptProposalUseCase" as AU
+participant "ContractFactory" as CF
+participant "MilestoneFactory" as MF
+participant "ContractRepository" as CR
+participant "DomainEventPublisher" as EP
+participant "NotificationEventListener" as NL
+database "PostgreSQL" as DB
+
+Cliente -> PC : POST /proposals/{id}/accept\n(PREMIUM, EQUAL_SPLIT, 2)
+PC -> AU : execute(command)
+AU -> AU : verificar propietario del proyecto\ny estado de la propuesta
+AU -> CF : crear(propuesta, plan, hitos)
+CF -> MF : crearHitos(monto, tipo, parts)
+MF --> CF : List<Milestone>
+CF --> AU : Contract(ACTIVE, comision 5%)
+AU -> CR : save(contract)
+CR -> DB : INSERT contract + hitos
+AU -> EP : publishAll(eventos)
+EP -> NL : ProposalAcceptedEvent / ContractCreatedEvent
+NL -> DB : INSERT notificaciones (outbox)
+AU --> PC : ContractView
+PC --> Cliente : 201 Created
+
+Freelancer -> PC : POST /contracts/{id}/milestones/{m}/deliverables
+PC -> AU : registrar entregable
+AU -> CR : findById + save
+CR -> DB : INSERT deliverable
+AU -> EP : DeliverableSubmittedEvent
+
+Freelancer -> PC : POST /contracts/{id}/milestones/{m}/submit
+PC -> AU : submit(milestone)
+AU -> CR : save
+AU -> EP : MilestoneStatusChangedEvent(SUBMITTED)
+
+Cliente -> PC : POST /contracts/{id}/milestones/{m}/approve
+PC -> AU : approve(milestone)
+AU -> CR : save
+CR -> DB : UPDATE milestone, deliverable
+AU -> EP : MilestoneStatusChangedEvent(APPROVED)
+alt todos los hitos aprobados
+  AU -> AU : contract.complete(actor)
+  AU -> EP : ContractCompletedEvent
+end
+AU --> PC : ContractView(progress=100)
+PC --> Cliente : 200 OK
+
+note over EP, NL
+  Observer: el agregado no conoce notificaciones
+  ni auditoria; solo publica eventos tipados.
+end note
+@enduml

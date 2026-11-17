@@ -1,0 +1,92 @@
+@startuml
+title FreeConnect - Monolito modular y dependencias
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam monochrome true
+left to right direction
+
+package "shared" as SH {
+  [Result / paginacion / Money]
+  [Eventos de dominio]
+  [Seguridad / errores]
+}
+
+package "identity" as ID {
+  [Auth / JWT / refresh]
+}
+package "profiles" as PR {
+  [Perfiles / skills / portafolio]
+}
+package "projects" as PJ {
+  [Proyectos / filtros / plantillas]
+}
+package "proposals" as PP {
+  [Propuestas / validacion]
+}
+package "contracts" as CT {
+  [Contratos / hitos / entregables]
+}
+package "messaging" as MS {
+  [Conversaciones / mensajes]
+}
+package "reviews" as RV {
+  [Resenas / reputacion]
+}
+package "payments" as PY {
+  [Pagos / comisiones]
+}
+package "notifications" as NT {
+  [Outbox / canales]
+}
+package "admin" as AD {
+  [Reportes / moderacion]
+}
+package "audit" as AU {
+  [Auditoria]
+}
+
+ID ..> SH
+PR ..> SH
+PJ ..> SH
+PP ..> SH
+CT ..> SH
+MS ..> SH
+RV ..> SH
+PY ..> SH
+NT ..> SH
+AD ..> SH
+AU ..> SH
+
+CT ..> PP : lee propuesta aceptada
+CT ..> PJ : actualiza proyecto
+MS ..> CT : valida participantes
+RV ..> CT : exige contrato completado
+RV ..> PR : actualiza reputacion
+PY ..> CT : valida monto y partes
+AD ..> PJ
+AD ..> CT
+AD ..> ID
+NT ..> CT : contrato para notificar
+NT ..> PJ : proyecto para notificar
+
+NT <.. PP : ProposalSubmitted/Accepted
+NT <.. CT : Contract/Milestone events
+NT <.. MS : MessageSentEvent
+NT <.. RV : ReviewCreatedEvent
+NT <.. PY : PaymentReleasedEvent
+AU <.. ID : eventos
+AU <.. PJ : eventos
+AU <.. PP : eventos
+AU <.. CT : eventos
+AU <.. MS : eventos
+AU <.. RV : eventos
+AU <.. PY : eventos
+
+note bottom of SH
+  Regla de dependencia: domain no conoce Spring/JPA.
+  api -> application -> domain <- infrastructure.
+  Las flechas discontinuas hacia NT/AU representan eventos
+  (Observer), no acoplamiento directo.
+end note
+@enduml

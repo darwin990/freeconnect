@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/freeconnect}
+    username: ${DATABASE_USER:freeconnect}
+    password: ${DATABASE_PASSWORD:freeconnect}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+
+freeconnect:
+  notifications:
+    email-provider: ${EMAIL_PROVIDER:LOG}
+  payments:
+    # Proveedores disponibles en esta entrega: MOCK y LEGACY.
+    provider: ${PAYMENT_PROVIDER:MOCK}

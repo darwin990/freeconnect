@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+*.log
+app.log
+app.err.log
+test-output.log
+data/
+docs/uml/*.png
+.env

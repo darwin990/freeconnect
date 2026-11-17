@@ -1,0 +1,28 @@
+@startuml
+title <Sistema> - Contexto y contenedores
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam monochrome true
+left to right direction
+
+actor "<Actor>" as Actor
+rectangle "<Sistema>" as Sistema {
+  component "<API / interfaz>" as API
+  component "<Modulo A>" as MA
+  component "<Modulo B>" as MB
+  API --> MA
+  API --> MB
+}
+
+database "<Base de datos>" as DB
+cloud "<Servicio externo>" as Ext
+
+Actor --> API : <protocolo>
+Sistema --> DB : <acceso>
+Sistema --> Ext : <puerto>
+
+legend right
+  <Nota sobre que es simulado o externo>
+endlegend
+@enduml

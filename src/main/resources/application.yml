@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: freeconnect
+  profiles:
+    default: dev
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  mvc:
+    problemdetails:
+      enabled: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+
+freeconnect:
+  security:
+    jwt:
+      # En produccion SIEMPRE via variable de entorno JWT_SECRET (>= 32 bytes)
+      secret: ${JWT_SECRET:freeconnect-dev-secret-key-change-me-please-32bytes-minimum}
+      issuer: freeconnect
+      access-token-ttl: PT15M
+      refresh-token-ttl: P7D
+    rate-limit:
+      enabled: true
+      capacity: 240
+      window: PT1M
+    password-hasher: bcrypt
+  bootstrap:
+    admin-email: ${ADMIN_EMAIL:admin@freeconnect.io}
+    admin-password: ${ADMIN_PASSWORD:Admin#FreeConnect2026}
+  notifications:
+    email-provider: ${EMAIL_PROVIDER:SMTP}
+    max-attempts: 5
+    retry-delay: PT30S
+  payments:
+    provider: ${PAYMENT_PROVIDER:MOCK}
+    commission-rate: 0.10
+  storage:
+    bucket: ${S3_BUCKET:freeconnect-portfolio}
+    endpoint: ${S3_ENDPOINT:http://localhost:9000}
+    public-base-url: ${S3_PUBLIC_URL:http://localhost:8080/assets}
+    provider: ${STORAGE_PROVIDER:filesystem}
+    local-path: ${STORAGE_LOCAL_PATH:./data/portfolio}
+
+logging:
+  level:
+    com.freeconnect: INFO
+    org.springframework.security: WARN

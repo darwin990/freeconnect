@@ -1,0 +1,43 @@
+@startuml
+title FreeConnect - Contexto y contenedores
+
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam monochrome true
+
+actor "Cliente" as Cliente
+actor "Freelancer" as Freelancer
+actor "Administrador" as Admin
+
+rectangle "FreeConnect API\nSpring Boot 3.5 / Java 21" as Plataforma {
+  component "API REST\n/api/v1" as Rest
+  component "Modulos de negocio\nidentity, profiles, projects,\nproposals, contracts, messaging,\nreviews, payments, admin" as Modulos
+  component "Notificaciones\n(outbox multicanal)" as Notif
+  component "Auditoria\n(eventos de dominio)" as Audit
+  Rest --> Modulos
+  Modulos --> Notif : eventos
+  Modulos --> Audit : eventos
+}
+
+database "PostgreSQL 16\nFlyway V1..V6" as Postgres
+database "Redis\n(cache / rate limit futuro)" as Redis
+cloud "ObjectStore\n(filesystem / S3-compatible)" as Storage
+cloud "Pasarela de pagos\nMOCK / LEGACY" as Gateway
+cloud "Canales de notificacion\nin-app / email / push" as Canales
+
+Cliente --> Rest : HTTPS + JWT
+Freelancer --> Rest : HTTPS + JWT
+Admin --> Rest : HTTPS + JWT
+Plataforma --> Postgres : JPA
+Plataforma --> Redis : opcional
+Modulos --> Storage : puerto ObjectStore
+Modulos --> Gateway : puerto PaymentGateway
+Notif --> Canales : Bridge
+
+legend right
+  El diagrama muestra el despliegue del MVP:
+  un unico proceso con limites de modulo.
+  Email/push y la pasarela son simulados.
+endlegend
+@enduml

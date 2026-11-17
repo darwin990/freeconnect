@@ -1,0 +1,156 @@
+@startuml
+title FreeConnect - Dominio de contratos (State, Composite, Strategy, Command)
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+package "contracts.domain" {
+  class Contract {
+    - UUID id
+    - UUID projectId
+    - UUID proposalId
+    - UUID clientId
+    - UUID freelancerId
+    - Money amount
+    - Money commission
+    - ContractStatus status
+    - List<Milestone> milestones
+    + activate(UUID actorId)
+    + addDeliverable(...): Deliverable
+    + submitMilestone(UUID, UUID)
+    + approveMilestone(UUID, UUID)
+    + rejectMilestone(UUID, UUID, String)
+    + complete(UUID)
+    + cancel(UUID, String)
+    + progress(): int
+    + transitionTo(ContractStatus, UUID)
+  }
+
+  class Milestone {
+    - UUID id
+    - Money amount
+    - MilestoneStatus status
+    - List<Deliverable> deliverables
+    + addDeliverable(...): Deliverable
+    + submit(UUID)
+    + approve(UUID)
+    + reject(UUID, String)
+    + ownProgress(): int
+    + progress(): int
+  }
+
+  class Deliverable {
+    - UUID id
+    - DeliverableStatus status
+    - List<TaskItem> tasks
+    + addTask(String): TaskItem
+    + toggleTask(UUID, boolean)
+    + addComment(UUID, String)
+    + approve()
+    + reject()
+  }
+
+  class TaskItem {
+    - UUID id
+    - String title
+    - boolean done
+    + toggle(boolean)
+    + ownProgress(): int
+  }
+
+  interface WorkComponent {
+    + id(): UUID
+    + children(): List<WorkComponent>
+    + ownProgress(): int
+    + progress(): int
+    + leafCount(): int
+  }
+
+  interface ContractState {
+    + status(): ContractStatus
+    + canTransitionTo(ContractStatus): boolean
+  }
+
+  class ContractStates {
+    + of(ContractStatus): ContractState
+  }
+
+  interface CommissionStrategy {
+    + plan(): CommissionPlan
+    + commissionFor(Money): Money
+  }
+
+  class StandardCommissionStrategy
+  class PremiumCommissionStrategy
+
+  interface ContractCommand {
+    + execute()
+    + undo()
+    + description(): String
+  }
+
+  class CompleteMilestoneCommand
+  class CancelContractCommand
+
+  class ContractCommandInvoker {
+    + run(ContractCommand)
+    + undoLast(): boolean
+    + history(): List<String>
+  }
+}
+
+class Money <<value object>> {
+  + amount(): BigDecimal
+  + currency(): String
+  + plus(Money): Money
+  + percentage(BigDecimal): Money
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+Contract *-- "1..*" Milestone : hitos
+Milestone *-- "0..*" Deliverable : entregables
+Deliverable *-- "0..*" TaskItem : tareas
+Milestone ..|> WorkComponent
+Deliverable ..|> WorkComponent
+TaskItem ..|> WorkComponent
+
+Contract --> ContractState : delega transiciones
+ContractStates ..> ContractState : registro
+Contract --> CommissionStrategy : calcula comision
+StandardCommissionStrategy ..|> CommissionStrategy
+PremiumCommissionStrategy ..|> CommissionStrategy
+
+ContractCommandInvoker o-- ContractCommand : historial
+CompleteMilestoneCommand ..|> ContractCommand
+CancelContractCommand ..|> ContractCommand
+CompleteMilestoneCommand --> Contract : modifica
+CancelContractCommand --> Contract : modifica
+
+Contract --> Money
+Milestone --> Money
+
+note right of WorkComponent
+  Composite: el progreso se calcula
+  igual para hitos, entregables y tareas.
+end note
+
+note bottom of ContractCommandInvoker
+  Command: execute() y undo() permiten
+  compensar una aprobacion o cancelacion.
+end note
+@enduml

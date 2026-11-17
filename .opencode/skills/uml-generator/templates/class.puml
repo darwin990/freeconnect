@@ -1,0 +1,38 @@
+@startuml
+title Agregado - Modelo de dominio
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+package "paquete.dominio" {
+  class Agregado {
+    - UUID id
+    - Estado status
+    + metodoDeNegocio()
+    + transitionTo(Estado, UUID)
+  }
+
+  class EntidadHija {
+    - UUID id
+    + metodo()
+  }
+
+  interface Patron {
+    + operacion()
+  }
+
+  enum Estado {
+    VALOR_1
+    VALOR_2
+  }
+}
+
+Agregado *-- "1..*" EntidadHija
+EntidadHija ..|> Patron
+
+note right of Patron
+  Explica por que existe este patron
+  y que problema resuelve.
+end note
+@enduml

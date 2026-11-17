@@ -1,0 +1,14 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.log
+app.log
+app.err.log
+test-output.log
+data/
+.env
+.idea/
+.vscode/
+*.iml
+*.class
+docs/uml/*.png
+docs/uml/*.svg

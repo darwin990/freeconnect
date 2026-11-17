@@ -1,0 +1,30 @@
+@startuml
+title Caso de uso - Flujo principal
+
+skinparam shadowing false
+skinparam monochrome true
+autonumber
+
+actor Usuario
+participant Controlador
+participant CasoDeUso
+participant Agregado
+participant Repositorio
+participant PublicadorEventos
+database BaseDeDatos
+
+Usuario -> Controlador : POST /recurso (payload)
+Controlador -> CasoDeUso : execute(comando)
+CasoDeUso -> Agregado : operacionDeNegocio()
+Agregado --> CasoDeUso : evento registrado
+CasoDeUso -> Repositorio : save(agregado)
+Repositorio -> BaseDeDatos : INSERT/UPDATE
+CasoDeUso -> PublicadorEventos : publishAll(eventos)
+CasoDeUso --> Controlador : Vista
+Controlador --> Usuario : 201 Created
+
+note over PublicadorEventos
+  Observer: los consumidores
+  reaccionan sin acoplar el dominio.
+end note
+@enduml
