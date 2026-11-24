@@ -87,8 +87,8 @@ export function ContractMilestoneCard({
 
       {milestone.status === "REJECTED" && (
         <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          El hito fue rechazado. El backend actual exige una transición adicional que la API no expone para
-          reenviarlo; revisa los comentarios o contacta al cliente. Está documentado como limitación.
+          El hito fue rechazado. Revisa los comentarios del cliente para corregir los entregables; en
+          esta versión del prototipo, el reenvío debe gestionarse con soporte.
         </div>
       )}
 

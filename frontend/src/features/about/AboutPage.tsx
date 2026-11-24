@@ -129,8 +129,8 @@ export function AboutPage() {
         />
         <SummaryCard
           icon={<Server className="size-5" aria-hidden="true" />}
-          title="Backend sin cambios"
-          text="La SPA consume los endpoints reales documentados en OpenAPI."
+          title="API real"
+          text="La SPA consume los endpoints documentados en OpenAPI."
         />
         <SummaryCard
           icon={<Database className="size-5" aria-hidden="true" />}

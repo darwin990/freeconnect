@@ -143,7 +143,7 @@ export function ProjectFilters({
               placeholder="10000"
             />
           </Field>
-          <Field label="Habilidad" htmlFor="filter-skill" hint="Una habilidad; el backend admite varias separadas por comas.">
+          <Field label="Habilidad" htmlFor="filter-skill" hint="Puedes separar varias habilidades con comas.">
             <Input
               id="filter-skill"
               value={form.skill}

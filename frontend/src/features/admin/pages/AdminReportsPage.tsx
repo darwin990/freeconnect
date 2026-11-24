@@ -46,7 +46,7 @@ export function AdminReportsPage() {
       <PageHeader
         eyebrow="Administración"
         title="Reportes agregados"
-        description="Métricas de proyectos, contratos y usuarios generadas por el backend."
+        description="Métricas de proyectos, contratos y usuarios para supervisar la actividad de la plataforma."
         actions={
           <Button
             variant="outline"
@@ -88,7 +88,7 @@ export function AdminReportsPage() {
       ) : reports.length === 0 ? (
         <EmptyState
           title="Sin reportes disponibles"
-          description="El backend no devolvió reportes agregados."
+          description="Aún no hay métricas para este periodo."
           icon={<BarChart3 className="size-6" aria-hidden="true" />}
         />
       ) : (
@@ -143,8 +143,8 @@ export function AdminReportsPage() {
               Origen de los datos
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600 dark:text-slate-300">
-              Los reportes agregados se generan en el backend con el patrón Visitor. El endpoint
-              GET /admin/reports requiere rol ADMIN tanto en SecurityConfig como en @PreAuthorize.
+              Los reportes se recalculan en cada actualización y solo están disponibles para cuentas
+              con rol de administración.
             </p>
           </div>
         </div>

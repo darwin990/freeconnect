@@ -65,7 +65,7 @@ export function MyProjectsPage() {
       <PageHeader
         eyebrow="Cliente"
         title="Mis proyectos"
-        description="Gestiona tus borradores, publicaciones y proyectos en curso. La lista se construye desde el catálogo público del backend y se filtra por tu usuario."
+        description="Gestiona tus borradores, publicaciones y proyectos en curso. Filtra por estado para encontrar cada proyecto y actúa sobre él."
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -140,18 +140,13 @@ export function MyProjectsPage() {
               />
             ))}
           </div>
-          <p className="text-xs text-ink-500">
-            El backend no expone un listado “mis proyectos”: la interfaz consulta el catálogo público y
-            filtra por <span className="font-mono">{user?.id?.slice(0, 8)}</span> en el navegador. Se
-            recomienda añadir <span className="font-mono">GET /projects/mine</span> en el backend.
-          </p>
         </>
       )}
 
       <Card>
         <CardHeader
           title="Plantillas de proyecto"
-          description="Crea un proyecto precargado a partir de una plantilla del backend y ajústalo antes de publicar."
+          description="Crea un proyecto precargado a partir de una plantilla y ajústalo antes de publicar."
           action={<FileSpreadsheet className="size-5 text-ink-400" aria-hidden="true" />}
         />
         {templatesQuery.isError ? (

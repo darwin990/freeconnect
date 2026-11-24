@@ -111,7 +111,7 @@ public class ProjectController {
     public ResponseEntity<ProjectView> create(@Valid @RequestBody ProjectRequest request) {
         ProjectView created = createProjectUseCase.execute(new CreateProjectCommand(request.title(),
                 request.description(), request.category(), request.budget(), request.currency(), request.modality(),
-                request.deadline(), request.skills()));
+                request.deadline(), request.skills(), request.status()));
         return ResponseEntity.created(URI.create("/api/v1/projects/" + created.id())).body(created);
     }
 

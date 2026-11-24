@@ -18,7 +18,7 @@ export function AdminAuditPage() {
       <PageHeader
         eyebrow="Administración"
         title="Auditoría"
-        description="Últimos 100 eventos auditados por el backend: acciones sobre proyectos, usuarios, contratos y pagos."
+        description="Últimos 100 eventos auditados: acciones sobre proyectos, usuarios, contratos y pagos."
         actions={
           <Button variant="outline" size="sm" onClick={() => void query.refetch()} loading={query.isFetching}>
             Actualizar

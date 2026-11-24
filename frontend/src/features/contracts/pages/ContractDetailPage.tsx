@@ -230,7 +230,7 @@ export function ContractDetailPage() {
           {contract.milestones.length === 0 ? (
             <EmptyState
               title="El contrato no tiene hitos"
-              description="Esto no debería ocurrir; contacta con soporte."
+              description="Este contrato aún no tiene hitos definidos. Contacta con soporte si el problema persiste."
             />
           ) : (
             contract.milestones.map((milestone) => (

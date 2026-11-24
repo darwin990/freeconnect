@@ -66,7 +66,7 @@ export function DemoPage() {
       <PageHeader
         eyebrow="Design system"
         title="Galería del prototipo"
-        description="Una vista rápida de tokens, componentes y estados de la interfaz. No consume datos reales ni modifica el backend."
+        description="Una vista rápida de tokens, componentes y estados de la interfaz. Los datos que muestra son ilustrativos y no modifican tu cuenta."
         actions={
           <>
             <ThemeToggle />
@@ -159,7 +159,7 @@ export function DemoPage() {
         <Card>
           <CardHeader title="Formularios" description="Foco visible, ayudas y errores accesibles." />
           <div className="mt-4 space-y-4">
-            <Field label="Correo electrónico" htmlFor="demo-email" hint="Ejemplo de ayuda contextual." required>
+            <Field label="Correo electrónico" htmlFor="demo-email" hint="Lo usaremos para avisos del contrato." required>
               <Input id="demo-email" type="email" placeholder="tu@correo.com" />
             </Field>
             <Field label="Categoría" htmlFor="demo-category">
@@ -175,7 +175,7 @@ export function DemoPage() {
             <Field
               label="Campo con error"
               htmlFor="demo-error"
-              hint="Ejemplo visual de estado inválido; no dispara mensajes live."
+              hint="Muestra el aspecto de un campo inválido; no envía datos."
             >
               <Input id="demo-error" invalid defaultValue="valor inválido" />
             </Field>
@@ -185,9 +185,9 @@ export function DemoPage() {
         <Card>
           <CardHeader title="Avatares, progreso y pestañas" description="Componentes de apoyo." />
           <div className="mt-4 flex items-center gap-3">
-            <Avatar name="Ana Pérez" size="lg" />
-            <Avatar name="Cliente E2E" size="md" />
-            <Avatar name="Freelancer" size="sm" />
+            <Avatar name="María Fernanda López" size="lg" />
+            <Avatar name="Carlos Andrés Ramírez" size="md" />
+            <Avatar name="Lucía Ortega" size="sm" />
           </div>
           <ProgressBar value={68} label="Progreso del contrato" className="mt-5" />
           <Tabs
@@ -267,7 +267,7 @@ export function DemoPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Diálogo de ejemplo"
+        title="Confirmar acción"
         description="Trampa de foco, cierre con Escape y animación respetuosa con reduced motion."
         footer={
           <>

@@ -110,7 +110,7 @@ export function DashboardPage() {
             ) : reports.length === 0 ? (
               <Card className="sm:col-span-2 xl:col-span-4">
                 <p className="text-sm text-ink-500">
-                  El backend no devolvió métricas agregadas.
+                  Todavía no hay métricas consolidadas para mostrar.
                 </p>
               </Card>
             ) : (
@@ -132,7 +132,7 @@ export function DashboardPage() {
             <Card>
               <CardHeader
                 title="Reportes disponibles"
-                description="Generados por el backend."
+                description="Resumen de la actividad de la plataforma."
                 action={
                   <Link to="/app/admin/reportes" className="text-sm font-semibold text-brand-700 hover:underline">
                     Ver todos
@@ -145,14 +145,14 @@ export function DashboardPage() {
                     {humanizeKey(report.report)}
                   </Badge>
                 ))}
-                {reports.length === 0 && <p className="text-sm text-ink-500">Sin reportes.</p>}
+                {reports.length === 0 && <p className="text-sm text-ink-500">Aún no hay reportes.</p>}
               </div>
             </Card>
 
             <Card>
               <CardHeader
                 title="Últimos eventos de auditoría"
-                description="Máximo 100 eventos según el backend."
+                description="Los 100 eventos más recientes de la plataforma."
                 action={
                   <Link to="/app/admin/auditoria" className="text-sm font-semibold text-brand-700 hover:underline">
                     Ver auditoría
@@ -162,7 +162,7 @@ export function DashboardPage() {
               {auditQuery.isError ? (
                 <ErrorAlert error={auditQuery.error} className="mt-4" />
               ) : audit.length === 0 ? (
-                <p className="mt-4 text-sm text-ink-500">Sin eventos.</p>
+                <p className="mt-4 text-sm text-ink-500">Aún no hay eventos registrados.</p>
               ) : (
                 <ul className="mt-4 divide-y divide-ink-100 text-sm">
                   {audit.slice(0, 5).map((entry) => (
@@ -428,7 +428,7 @@ export function DashboardPage() {
                 <CardHeader title="Rol y alcance" />
                 <p className="mt-3 text-sm text-ink-600">
                   Estás operando como <strong>{roleLabels[user.role]}</strong>. La navegación y las acciones
-                  visibles se adaptan a los permisos del backend.
+                  visibles se adaptan a los permisos de tu cuenta.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge tone="brand">{roleLabels[user.role]}</Badge>

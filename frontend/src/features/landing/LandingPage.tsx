@@ -173,7 +173,7 @@ export function LandingPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">
-                      Contrato de ejemplo
+                      Contrato en curso
                     </p>
                     <p className="mt-1 font-semibold text-ink-950">API de reservas · 3 hitos</p>
                   </div>
@@ -184,9 +184,9 @@ export function LandingPage() {
                 <ProgressBar value={66} label="Progreso del contrato" className="mt-4" />
                 <ul className="mt-4 space-y-2 text-sm">
                   {[
-                    ["Hito 1", "Aprobado", "success"],
-                    ["Hito 2", "Aprobado", "success"],
-                    ["Hito 3", "En revisión", "info"],
+                    ["Modelo de datos", "Aprobado", "success"],
+                    ["API REST", "Aprobado", "success"],
+                    ["Pruebas de integración", "En revisión", "info"],
                   ].map(([name, state, tone]) => (
                     <li
                       key={name}
@@ -223,7 +223,7 @@ export function LandingPage() {
             Un flujo completo, de la propuesta al pago
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-500">
-            Cada pantalla consume endpoints reales del backend y respeta los permisos por rol.
+            Cada pantalla respeta los permisos de tu rol y mantiene la información sincronizada.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

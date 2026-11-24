@@ -149,7 +149,7 @@ export function ProfilePage() {
         <PageHeader title="Mi perfil" description="La cuenta administrativa no gestiona perfil público." />
         <Card>
           <p className="text-sm text-ink-600">
-            El backend no expone perfil público para el rol ADMIN. Usa la sección de administración
+            Las cuentas de administración no tienen perfil público. Usa la sección de administración
             para reportes, moderación y auditoría.
           </p>
         </Card>
@@ -193,7 +193,7 @@ export function ProfilePage() {
         <Card>
           <CardHeader
             title={role === "FREELANCER" ? "Perfil profesional" : "Perfil de empresa"}
-            description="Los cambios se guardan en el backend y se reflejan de inmediato."
+            description="Los cambios se guardan y se reflejan de inmediato."
           />
           <form className="mt-5 space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
             {updateProfile.isError ? <ErrorAlert error={updateProfile.error} /> : null}
@@ -236,7 +236,7 @@ export function ProfilePage() {
                 <Field
                   label="Habilidades"
                   htmlFor="skills"
-                  hint="Separa las habilidades con comas. El catálogo se resuelve en el backend."
+                  hint="Sepáralas con comas. Se validan automáticamente."
                   error={errors.skills?.message}
                 >
                   <Input id="skills" placeholder="React, TypeScript, Spring Boot" {...register("skills")} />

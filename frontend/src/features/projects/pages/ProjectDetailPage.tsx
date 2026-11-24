@@ -107,7 +107,7 @@ export function ProjectDetailPage() {
           <Card>
             <h2 className="text-lg font-semibold text-ink-900">Descripción del proyecto</h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink-700">
-              {project.description || "El cliente no añadió una descripción."}
+              {project.description || "El cliente aún no ha detallado el alcance de este proyecto."}
             </p>
             {project.skills?.length ? (
               <div className="mt-5">
@@ -125,7 +125,7 @@ export function ProjectDetailPage() {
             <Card>
               <CardHeader
                 title="Estado del proyecto"
-                description="Las transiciones las valida el backend con el patrón State."
+                description="Solo se muestran las acciones permitidas para el estado actual."
               />
               <div className="mt-4">
                 <ProjectStatusActions project={project} />

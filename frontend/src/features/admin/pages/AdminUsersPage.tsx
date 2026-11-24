@@ -37,7 +37,7 @@ export function AdminUsersPage() {
       <PageHeader
         eyebrow="Administración"
         title="Suspensión de usuarios"
-        description="Suspende una cuenta por su identificador. El backend no expone un listado de usuarios ni búsqueda por email."
+        description="Suspende una cuenta por su identificador. Por seguridad, la búsqueda requiere el UUID exacto del usuario."
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -104,19 +104,19 @@ export function AdminUsersPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Limitaciones del backend" />
+          <CardHeader title="Cómo obtener el identificador" />
           <ul className="mt-4 space-y-3 text-sm text-ink-600">
             <li className="flex gap-2">
               <span aria-hidden="true">•</span>
-              No existe <span className="font-mono text-xs">GET /users</span> ni búsqueda por email.
+              La búsqueda directa por correo no está disponible en esta versión.
             </li>
             <li className="flex gap-2">
               <span aria-hidden="true">•</span>
-              No hay endpoint para reactivar una cuenta suspendida desde la interfaz.
+              Una cuenta suspendida no puede reactivarse desde esta pantalla.
             </li>
             <li className="flex gap-2">
               <span aria-hidden="true">•</span>
-              El UUID puede obtenerse de un proyecto, contrato o reseña visible para administración.
+              El UUID aparece en el detalle de un proyecto, contrato o reseña visible para administración.
             </li>
             <li className="flex gap-2">
               <span aria-hidden="true">•</span>

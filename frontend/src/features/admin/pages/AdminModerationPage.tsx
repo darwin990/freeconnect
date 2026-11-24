@@ -55,7 +55,7 @@ export function AdminModerationPage() {
       <PageHeader
         eyebrow="Administración"
         title="Moderación de proyectos"
-        description="Pausa o cancela proyectos por moderación. El backend valida la transición y registra auditoría."
+        description="Pausa o cancela proyectos por moderación. Cada cambio de estado queda registrado en la auditoría."
       />
 
       {moderate.isError ? <ErrorAlert error={moderate.error} title="No se pudo moderar el proyecto" /> : null}
